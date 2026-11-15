@@ -509,34 +509,102 @@ export function chuteSetupScreen() {
 }
 
 // ---------- installer le jeu sur le téléphone ----------
+// Petits pictogrammes qui imitent les boutons du téléphone, pour qu'on les reconnaisse du premier coup d'œil.
+// Renvoie la largeur dessinée.
+function phonePicto(kind, x, y) {
+  const BLUE = '#0a84ff';
+  if (kind === 'add') {
+    // le bouton « Ajouter » de l'iPhone (ou « Installer » d'Android), écrit en bleu
+    const label = t('install.addLabel');
+    const w = measure(label) + 10;
+    rect(x - 1, y - 1, w + 2, 20, INK);
+    rect(x, y, w, 18, '#ffffff');
+    text(label, x + 5, y + 6, { color: BLUE });
+    return w;
+  }
+  rect(x - 1, y - 1, 20, 20, INK);
+  rect(x, y, 18, 18, '#f2f2f7');
+  if (kind === 'share') {
+    // carré ouvert en haut, avec une flèche qui en sort vers le haut
+    rect(x + 4, y + 8, 2, 7, BLUE); rect(x + 12, y + 8, 2, 7, BLUE); rect(x + 4, y + 14, 10, 2, BLUE);
+    rect(x + 4, y + 8, 3, 2, BLUE); rect(x + 11, y + 8, 3, 2, BLUE);
+    rect(x + 8, y + 3, 2, 9, BLUE);
+    rect(x + 6, y + 5, 2, 2, BLUE); rect(x + 10, y + 5, 2, 2, BLUE); rect(x + 7, y + 4, 4, 1, BLUE);
+  } else if (kind === 'dots') {
+    // les trois petits points du menu
+    for (let i = 0; i < 3; i++) rect(x + 4 + i * 4, y + 8, 2, 2, '#1c1c1e');
+  } else if (kind === 'addhome') {
+    // carré arrondi avec un « + » : « Sur l'écran d'accueil »
+    frame(x + 3, y + 3, 12, 12, '#1c1c1e');
+    rect(x + 8, y + 6, 2, 6, '#1c1c1e'); rect(x + 6, y + 8, 6, 2, '#1c1c1e');
+  } else if (kind === 'browser') {
+    // une boussole : le navigateur du téléphone (Safari, Chrome)
+    disc(x + 9, y + 9, 7, BLUE);
+    disc(x + 9, y + 9, 5, '#ffffff');
+    line(x + 6, y + 12, x + 12, y + 6, '#ff3b30', 2);
+  }
+  return 18;
+}
+
+// Les étapes à suivre, selon le téléphone et le navigateur. null : un simple texte suffit.
+function installSteps() {
+  if (install.inApp) return [['dots', 'install.inapp.1'], ['browser', 'install.inapp.2'], [null, 'install.inapp.3']];
+  if (install.platform === 'ios') return [['share', 'install.ios.1'], ['addhome', 'install.ios.2'], ['add', 'install.ios.3']];
+  if (install.platform === 'android') return [['dots', 'install.android.1'], ['addhome', 'install.android.2'], ['add', 'install.android.3']];
+  return null;
+}
+
 export function installScreen(back = () => app.go(titleScreen())) {
   let done = false;
   return menuScene({
     draw(sc) {
       synthBg(sc.t, { calm: true });
       header(t('install.title'));
-      const key = done || install.isInstalled ? 'install.ok' : install.canPrompt ? 'install.auto' : 'install.' + install.platform;
+      const ok = done || install.isInstalled;
+      const auto = !ok && install.canPrompt && !install.inApp;
+      const steps = ok || auto ? null : installSteps();
+      const key = ok ? 'install.ok' : auto ? 'install.auto' : 'install.other';
       const pw = G.W - 34;
+      // le texte de chaque étape commence juste après le numéro et le pictogramme
+      const pictoW = (kind) => (kind === 'add' ? measure(t('install.addLabel')) + 10 : kind ? 18 : 0);
+      const txOf = (kind) => 30 + (kind ? pictoW(kind) + 6 : 0);
+      const twOf = (kind) => G.W - txOf(kind) - 14;
+      const rowH = (st) => Math.max(20, textH(t(st[1]), twOf(st[0]))) + 7;
+      const iconS = G.H >= 400 ? 48 : 36;
       // le panneau prend la hauteur de son contenu, et se place au milieu de l'écran
-      const content = 10 + 56 + textH(t('install.why'), pw) + 8 + textH(t(key), pw) + 10;
+      const body = steps ? steps.reduce((s, st) => s + rowH(st), 0) : textH(t(key), pw);
+      const content = 10 + iconS + 8 + textH(t('install.why'), pw) + 8 + body + 8;
       const top = 32 + G.safeTop;
-      const bottom = G.H - (install.canPrompt && !done ? 46 : 10) - G.safeBottom;
-      const y0 = top + Math.max(4, Math.floor((bottom - top - content) / 2));
+      const bottom = G.H - (auto && !done ? 46 : 10) - G.safeBottom;
+      const y0 = top + Math.max(2, Math.floor((bottom - top - content) / 2));
       panel(8, y0, G.W - 16, content, '#22c58b');
       let y = y0 + 10;
       if (app.icon) {
         // l'icône du jeu, telle qu'elle apparaîtra sur l'écran d'accueil
-        rect(G.W / 2 - 25, y - 1, 50, 50, INK);
-        G.ctx.drawImage(app.icon, Math.round(G.W / 2 - 24), y, 48, 48);
+        rect(G.W / 2 - iconS / 2 - 1, y - 1, iconS + 2, iconS + 2, INK);
+        G.ctx.drawImage(app.icon, Math.round(G.W / 2 - iconS / 2), y, iconS, iconS);
       }
-      y += 56;
+      y += iconS + 8;
       y += paragraph(t('install.why'), G.W / 2, y, pw, { align: 'center', color: '#fff6cf' }) + 8;
-      paragraph(t(key), 16, y, pw, { color: '#ffffff' });
+      if (!steps) { paragraph(t(key), 16, y, pw, { color: '#ffffff' }); return; }
+      steps.forEach((st, i) => {
+        const [kind, k] = st;
+        const tw = twOf(kind);
+        if (i > 0) rect(14, y - 4, G.W - 28, 1, 'rgba(255,255,255,0.15)');
+        // numéro de l'étape
+        disc(19, y + 9, 6, INK);
+        disc(19, y + 9, 5, PAL.yellow);
+        text(String(i + 1), 19, y + 6, { align: 'center', color: INK });
+        if (kind) phonePicto(kind, 30, y);
+        const ty = y + Math.max(0, Math.floor((20 - textH(t(k), tw)) / 2)) + 1;
+        paragraph(t(k), txOf(kind), ty, tw, { color: '#ffffff' });
+        y += rowH(st);
+      });
     },
     buttons() {
       const bs = [backButton(back)];
       const w = Math.min(G.W - 36, 148);
-      if (install.canPrompt && !done) {
+      if (install.canPrompt && !done && !install.inApp) {
         bs.unshift({ id: 'go', x: Math.round((G.W - w) / 2), y: G.H - 36 - G.safeBottom, w, h: 24, big: true, icon: 'down', label: t('install.button').toUpperCase(), color: '#22c58b', onClick: () => { install.prompt().then((ok) => { done = ok; }); } });
       }
       return bs;

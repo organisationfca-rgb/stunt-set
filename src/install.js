@@ -29,6 +29,11 @@ export const install = {
   get canPrompt() {
     return !!deferred;
   },
+  // true si la page est ouverte dans le navigateur intégré d'une appli (Instagram, Facebook, TikTok, Snapchat…) :
+  // on ne peut pas y installer le jeu, il faut d'abord ouvrir la page dans le vrai navigateur du téléphone.
+  get inApp() {
+    return /Instagram|FBAN|FBAV|FB_IAB|TikTok|musical_ly|Bytedance|Snapchat|LinkedInApp|Twitter|Line\//i.test(navigator.userAgent || '');
+  },
   // 'ios', 'android' ou 'other' (ordinateur)
   get platform() {
     const ua = navigator.userAgent || '';

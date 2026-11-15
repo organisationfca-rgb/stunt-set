@@ -6,8 +6,8 @@ import { loadLanguages, initLanguage } from './i18n.js';
 import { audio } from './audio.js';
 import { app } from './app.js';
 import { board } from './leaderboard.js';
-import { langScreen, charScreen, titleScreen } from './screens.js';
-import { registerServiceWorker } from './install.js';
+import { langScreen, charScreen, titleScreen, installScreen } from './screens.js';
+import { registerServiceWorker, install } from './install.js';
 
 registerServiceWorker(); // copie du jeu sur l'appareil : lancement hors ligne et mises à jour automatiques
 
@@ -26,10 +26,23 @@ async function boot() {
   app.logo = logo;
   app.logoSmall = logoSmall;
 
+  // Lien direct vers l'installation : https://…/stunt-set/?installer (pratique à partager).
+  // Une fois dans le vrai navigateur, on retire « ?installer » de l'adresse : l'icône posée sur l'écran d'accueil
+  // ouvrira ainsi le jeu normalement. Dans le navigateur d'une appli (Instagram…), on le garde pour que
+  // « Ouvrir dans le navigateur » arrive encore sur les étapes d'installation.
+  const wantsInstall = /[?&]installer\b/.test(window.location.search) && !install.isInstalled;
+  if (/[?&]installer\b/.test(window.location.search) && !install.inApp) {
+    try { history.replaceState(null, '', window.location.pathname + window.location.hash); } catch (e) { /* pas grave */ }
+  }
+
   // Premier lancement : langue, puis personnage, puis écran titre.
   const toTitle = () => { save.set('onboarded', true); app.go(titleScreen()); };
   const toChar = () => app.go(charScreen(toTitle, null));
-  if (!save.data.lang) app.go(langScreen(toChar));
+  const afterInstall = () => (save.data.character ? app.go(titleScreen()) : toChar());
+  if (wantsInstall) {
+    if (!save.data.lang) app.go(langScreen(() => app.go(installScreen(afterInstall))));
+    else app.go(installScreen(afterInstall));
+  } else if (!save.data.lang) app.go(langScreen(toChar));
   else if (!save.data.character) toChar();
   else app.go(titleScreen());
 
