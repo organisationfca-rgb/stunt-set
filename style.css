@@ -1,0 +1,99 @@
+/* Stunt Set ! — mise en page : le jeu occupe tout l'écran, en portrait, sans zoom ni défilement. */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #0b0518;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  inset: 0;
+}
+
+#game {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  touch-action: none;
+  background: #150a2e;
+}
+
+/* Sert à mesurer les zones sûres (encoche, barre du bas) */
+#safe-probe {
+  position: fixed;
+  visibility: hidden;
+  pointer-events: none;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 18vh;
+  background: rgba(8, 3, 20, 0.86);
+  z-index: 10;
+}
+#overlay[hidden] { display: none; }
+
+#pseudo-form {
+  width: min(86vw, 340px);
+  box-sizing: border-box;
+  padding: 18px;
+  background: #1d0f3f;
+  border: 3px solid #2de2e6;
+  box-shadow: 4px 4px 0 #06030f;
+  font-family: "Courier New", Courier, monospace;
+  color: #fff;
+  -webkit-user-select: text;
+  user-select: text;
+}
+#pseudo-label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffd23f;
+}
+#pseudo-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  font: bold 22px "Courier New", Courier, monospace;
+  letter-spacing: 1px;
+  color: #fff;
+  background: #0b0518;
+  border: 3px solid #ff2e97;
+  border-radius: 0;
+  outline: none;
+}
+#pseudo-hint { margin: 10px 0 0; font-size: 13px; color: #9d8fc0; }
+#pseudo-error { min-height: 18px; margin: 8px 0 0; font-size: 14px; color: #ff8a3c; }
+#pseudo-form .row { display: flex; gap: 10px; margin-top: 12px; }
+#pseudo-form button {
+  flex: 1;
+  padding: 12px 6px;
+  font: bold 16px "Courier New", Courier, monospace;
+  color: #fff;
+  background: #24104a;
+  border: 3px solid #2de2e6;
+  border-radius: 0;
+  cursor: pointer;
+}
+#pseudo-form button[type="submit"] { border-color: #ff2e97; }
+#pseudo-form button:active { background: #3a1d6e; }

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <!-- Sécurité : la page ne charge que les fichiers du jeu, et ne parle qu'au serveur du classement (Google Apps Script).
+       Aucun script, image ou style venant d'ailleurs ne peut s'exécuter, même si quelqu'un réussissait à en glisser un. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'none'; media-src 'none'; connect-src 'self' https://script.google.com https://script.googleusercontent.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#150a2e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Stunt Set ! Le jeu d'arcade du Festival de la Cascade et de l'Action.">
+  <title>Stunt Set !</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="Stunt Set">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="safe-probe"></div>
+  <canvas id="game" width="180" height="320"></canvas>
+
+  <!-- Saisie du pseudo (les textes sont remplis par le jeu, dans la langue du joueur) -->
+  <div id="overlay" hidden>
+    <form id="pseudo-form" autocomplete="off">
+      <label id="pseudo-label" for="pseudo-input"></label>
+      <input id="pseudo-input" type="text" inputmode="text" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="done">
+      <p id="pseudo-hint"></p>
+      <p id="pseudo-error" role="alert"></p>
+      <div class="row">
+        <button type="button" id="pseudo-cancel"></button>
+        <button type="submit" id="pseudo-ok"></button>
+      </div>
+    </form>
+  </div>
+
+  <noscript>Ce jeu a besoin de JavaScript. / This game needs JavaScript.</noscript>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
