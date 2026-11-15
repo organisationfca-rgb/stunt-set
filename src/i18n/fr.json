@@ -46,8 +46,6 @@
   "install.done": "Fait",
   "install.why": "Mets Stunt Set sur ton écran d'accueil pour le lancer en un geste, même sans réseau.",
   "install.auto": "Touche « Installer » ci-dessous, puis confirme.",
-  "install.ios": "Sur iPhone :\n1. Ouvre cette page dans Safari.\n2. Touche le bouton Partager.\n3. Choisis « Sur l'écran d'accueil ».",
-  "install.android": "Sur Android :\n1. Ouvre cette page dans Chrome.\n2. Ouvre le menu (les trois points).\n3. Choisis « Ajouter à l'écran d'accueil ».",
   "install.other": "Sur ordinateur : clique sur l'icône d'installation, dans la barre d'adresse du navigateur.",
   "install.ok": "C'est installé ! Lance le jeu depuis ton écran d'accueil.",
   "game.chute": "La chute",
@@ -171,5 +169,16 @@
   "tuto.chute.3.keys": "Pendant la chute, déplace ton cascadeur avec les flèches. Évite les zones rouges : un obstacle va y passer. Passe dans les ronds verts : c'est un cerceau de feu, +500 points.",
   "tuto.chute.4.title": "Fais des figures",
   "tuto.chute.4.body": "Glisse ton pouce droit : vers le haut ou le bas pour un salto, sur le côté pour une vrille. Enchaîne-les pour un combo qui multiplie tes points. Si un obstacle te touche, le combo en cours est perdu.",
-  "tuto.chute.4.keys": "Touches Z et S pour un salto, Q et D pour une vrille. Enchaîne-les pour un combo qui multiplie tes points. Si un obstacle te touche, le combo en cours est perdu."
+  "tuto.chute.4.keys": "Touches Z et S pour un salto, Q et D pour une vrille. Enchaîne-les pour un combo qui multiplie tes points. Si un obstacle te touche, le combo en cours est perdu.",
+
+  "install.addLabel": "Ajouter",
+  "install.ios.1": "Dans Safari, touche le bouton Partager (en bas de l'écran, parfois rangé sous les trois points).",
+  "install.ios.2": "Fais défiler et choisis « Sur l'écran d'accueil ».",
+  "install.ios.3": "Touche Ajouter, en haut à droite. C'est fini !",
+  "install.android.1": "Dans Chrome, ouvre le menu (les trois points, en haut à droite).",
+  "install.android.2": "Choisis « Installer l'application » ou « Ajouter à l'écran d'accueil ».",
+  "install.android.3": "Confirme. C'est fini !",
+  "install.inapp.1": "Tu es dans le navigateur d'une appli (Instagram par exemple). Touche les trois points, en haut à droite.",
+  "install.inapp.2": "« Ouvrir dans le navigateur » (Safari ou Chrome).",
+  "install.inapp.3": "Le jeu s'ouvre dans ton navigateur : suis alors les étapes pour l'installer."
 }

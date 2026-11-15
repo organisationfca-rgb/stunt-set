@@ -46,8 +46,6 @@
   "install.done": "Done",
   "install.why": "Put Stunt Set on your home screen to launch it in one tap, even offline.",
   "install.auto": "Tap “Install” below, then confirm.",
-  "install.ios": "On iPhone:\n1. Open this page in Safari.\n2. Tap the Share button.\n3. Choose “Add to Home Screen”.",
-  "install.android": "On Android:\n1. Open this page in Chrome.\n2. Open the menu (three dots).\n3. Choose “Add to Home screen”.",
   "install.other": "On a computer: click the install icon in the browser's address bar.",
   "install.ok": "Installed! Launch the game from your home screen.",
   "game.chute": "The High Fall",
@@ -171,5 +169,16 @@
   "tuto.chute.3.keys": "During the fall, move your performer with the arrow keys. Avoid the red zones: an obstacle will pass there. Go through the green circles: a ring of fire, +500 points.",
   "tuto.chute.4.title": "Do tricks",
   "tuto.chute.4.body": "Swipe with your right thumb: up or down for a flip, sideways for a twist. Chain them for a combo that multiplies your points. If an obstacle hits you, the current combo is lost.",
-  "tuto.chute.4.keys": "W and S keys for a flip, A and D for a twist. Chain them for a combo that multiplies your points. If an obstacle hits you, the current combo is lost."
+  "tuto.chute.4.keys": "W and S keys for a flip, A and D for a twist. Chain them for a combo that multiplies your points. If an obstacle hits you, the current combo is lost.",
+
+  "install.addLabel": "Add",
+  "install.ios.1": "In Safari, tap the Share button (at the bottom of the screen, sometimes under the three dots).",
+  "install.ios.2": "Scroll down and choose “Add to Home Screen”.",
+  "install.ios.3": "Tap Add, at the top right. Done!",
+  "install.android.1": "In Chrome, open the menu (the three dots, at the top right).",
+  "install.android.2": "Choose “Install app” or “Add to Home screen”.",
+  "install.android.3": "Confirm. Done!",
+  "install.inapp.1": "You are in an app's browser (Instagram for example). Tap the three dots, at the top right.",
+  "install.inapp.2": "“Open in browser” (Safari or Chrome).",
+  "install.inapp.3": "The game opens in your browser: then follow the steps to install it."
 }
