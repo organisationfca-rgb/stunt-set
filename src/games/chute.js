@@ -434,8 +434,14 @@ export function chuteGame(opts = {}) {
     st.tutoPage++;
     if (st.tutoPage >= TUTO_PAGES) { st.tutoPage = TUTO_PAGES - 1; tutoEnd(); }
   }
+  function tutoPrev() {
+    if (st.tutoPage === 0) return;
+    audio.sfx('click');
+    st.tutoPage--;
+  }
 
   const scene = {
+    state: () => st, // pour les tests sur l'ordinateur (lecture seule)
     enter() {
       audio.music('chute');
       audio.intensity(0.3);
@@ -460,13 +466,18 @@ export function chuteGame(opts = {}) {
         return;
       }
       if (st.phase === 'tutorial') {
+        // « Passer » en haut à droite ; flèche « précédent » en bas à gauche ; partout ailleurs : page suivante
         const sb = skipBtn();
+        const pb = tutoArrows().prev;
         const onSkip = p.x >= sb.x - 4 && p.y < sb.y + sb.h + 8;
-        if (type === 'down') st.pausePressed = onSkip ? 'skip' : null;
+        const onPrev = st.tutoPage > 0 && p.x >= pb.x - 6 && p.x < pb.x + pb.w + 6 && p.y >= pb.y - 6 && p.y < pb.y + pb.h + 6;
+        if (type === 'down') st.pausePressed = onSkip ? 'skip' : onPrev ? 'prev' : 'next';
         if (type === 'up' && !p.cancelled) {
-          const wasSkip = st.pausePressed === 'skip';
+          const was = st.pausePressed;
           st.pausePressed = null;
-          if (wasSkip && onSkip) { audio.sfx('click'); tutoEnd(); } else if (!wasSkip) tutoNext();
+          if (was === 'skip' && onSkip) { audio.sfx('click'); tutoEnd(); }
+          else if (was === 'prev' && onPrev) tutoPrev();
+          else if (was === 'next') tutoNext();
         }
         return;
       }
@@ -489,7 +500,9 @@ export function chuteGame(opts = {}) {
         p.data.ox = p.x;
         p.data.oy = p.y;
         p.data.swiped = false;
+        p.data.dist = 0;
       } else if (type === 'move') {
+        p.data.dist += Math.abs(p.dx) + Math.abs(p.dy);
         if (p.data.side === 'L') {
           // pouce gauche : déplacer le cascadeur
           f.px += p.dx * C.fall.touchGain;
@@ -507,15 +520,19 @@ export function chuteGame(opts = {}) {
           }
         }
       } else if (type === 'up') {
-        // pouce droit, simple tape : position dos
-        if (p.data.side === 'R' && !p.data.swiped && !p.cancelled && performance.now() - p.t0 < 400) doDos();
+        // simple tape, à gauche comme à droite : position dos.
+        // À gauche, le doigt sert aussi à se déplacer : on ne compte qu'un appui bref, presque sans bouger.
+        const quick = !p.cancelled && performance.now() - p.t0 < 400;
+        if (p.data.side === 'R' && !p.data.swiped && quick) doDos();
+        else if (p.data.side === 'L' && quick && p.data.dist < 5) doDos();
       }
     },
 
     key(code, down) {
       if (!down) return;
       if (st.phase === 'tutorial') {
-        if (code === 'Space' || code === 'Enter') tutoNext();
+        if (code === 'Space' || code === 'Enter' || code === 'ArrowRight') tutoNext();
+        else if (code === 'ArrowLeft') tutoPrev();
         else if (code === 'Escape') { audio.sfx('click'); tutoEnd(); }
         return;
       }
@@ -1065,6 +1082,23 @@ export function chuteGame(opts = {}) {
   // 5 pages : 1 viser, 2 le vent, 3 esquiver (pouce gauche), 4 les figures (pouce droit), 5 la position dos.
   const skipBtn = () => ({ id: 'skip', x: G.W - 74, y: 5 + G.safeTop, w: 68, h: 17, icon: 'next', label: t('tuto.skip'), color: '#7c5cff' });
 
+  // Le panneau du bas prend juste la hauteur de son texte ; l'illustration occupe tout le reste.
+  function tutoLayout() {
+    const page = st.tutoPage;
+    const body = t('tuto.chute.' + (page + 1) + (page >= 2 && !isTouch() ? '.keys' : '.body'));
+    const panelH = 22 + wrap(body, G.W - 28).length * 10 + 26;
+    return { body, panelH, py: G.H - panelH - 6 - G.safeBottom };
+  }
+  // Flèches en bas du panneau : revenir à l'explication précédente, passer à la suivante.
+  function tutoArrows() {
+    const { panelH, py } = tutoLayout();
+    const y = py + panelH - 24;
+    return {
+      prev: { id: 'prev', kind: 'round', x: 10, y, w: 22, h: 22, icon: 'left', color: '#7c5cff' },
+      next: { id: 'next', kind: 'round', x: G.W - 32, y, w: 22, h: 22, icon: 'right', color: '#ff2e97' },
+    };
+  }
+
   function drawTutorial() {
     const { W, H } = G;
     const tt = st.time;
@@ -1072,10 +1106,7 @@ export function chuteGame(opts = {}) {
     const page = st.tutoPage;
     const touch = isTouch();
     const title = t('tuto.chute.' + (page + 1) + '.title');
-    const body = t('tuto.chute.' + (page + 1) + (page >= 2 && !touch ? '.keys' : '.body'));
-    // le panneau du bas prend juste la hauteur de son texte ; l'illustration occupe tout le reste
-    const panelH = 22 + wrap(body, W - 28).length * 10 + 22;
-    const py = H - panelH - 6 - G.safeBottom;
+    const { body, panelH, py } = tutoLayout();
     const cx = Math.floor(W / 2);
     const cy = Math.max(64 + G.safeTop, Math.floor(py * 0.46));
     const gy = py - 26;
@@ -1160,9 +1191,13 @@ export function chuteGame(opts = {}) {
     panel(6, py, W - 12, panelH, PAL.magenta);
     fitText(title, cx, py + 8, { color: PAL.yellow });
     paragraph(body, cx, py + 22, W - 28, { align: 'center', color: PAL.white });
-    // points de progression, et rappel du geste
-    for (let i = 0; i < TUTO_PAGES; i++) disc(13 + i * 8, py + panelH - 10, i === page ? 3 : 2, i === page ? '#ffd23f' : '#5a4f73');
-    if (Math.floor(tt * 2.5) % 2 === 0) text(t(touch ? 'tuto.tap' : 'tuto.key'), W - 12, py + panelH - 14, { color: PAL.cyan, align: 'right' });
+    // en bas : flèche précédent, points de progression, flèche suivant
+    const ar = tutoArrows();
+    if (page > 0) drawButton(ar.prev, st.pausePressed === 'prev', false);
+    drawButton(ar.next, st.pausePressed === 'next', false);
+    const dy = ar.next.y + 11;
+    for (let i = 0; i < TUTO_PAGES; i++) disc(cx - (TUTO_PAGES - 1) * 4 + i * 8, dy - 6, i === page ? 3 : 2, i === page ? '#ffd23f' : '#5a4f73');
+    if (Math.floor(tt * 2.5) % 2 === 0) text(t(touch ? 'tuto.tap' : 'tuto.key'), cx, dy, { color: PAL.cyan, align: 'center' });
     // bandeau : on sait tout de suite qu'on est dans le tutoriel, et où on en est
     const head = t('tuto.title') + '  ' + (page + 1) + '/' + TUTO_PAGES;
     const hw = measure(head) + 12;
